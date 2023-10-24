@@ -78,7 +78,24 @@ This section is graded based on the Github submission. Each person needs to have
 
 ```{python}
 # Add data preparation code here
+import random
+import pandas as pd
 
+# set random seed
+random.seed(1494)
+
+# load dataset
+url = "https://archive.ics.uci.edu/ml/machine-learning-databases/00468/online_shoppers_intention.csv"
+g05_df = pd.read_csv(url)
+
+# check the data info
+g05_df.head()
+g05_df.info()
+
+
+# check any missing values and remove it
+g05_df.isnull().sum()
+g05_df.dropna(inplace=True)
 
 ```
 
@@ -87,12 +104,15 @@ This section is graded based on the Github submission. Each person needs to have
 ```{python}
 # Add code here
 
+g05_df.head()
+
 ```
 
 ## Use `describe` to provide statistics on the pandas Dataframe (2 Points).
 
 ```{python}
 # Add code here
+g05_df.describe()
 
 ```
 
@@ -100,6 +120,19 @@ This section is graded based on the Github submission. Each person needs to have
 
 ```{python}
 # Add code here
+
+from sklearn.model_selection import train_test_split
+
+# Assuming the target variable is 'Revenue'
+g05_X = g05_df.drop('Revenue', axis=1)
+g05_y = g05_df['Revenue']
+
+# Splitting the dataset into training (80%) and test set (20%)
+g05_X_train, g05_X_test, g05_y_train, g05_y_test = train_test_split(g05_X, g05_y, test_size=0.2, random_state=42)
+
+print(f"Training set has {g05_X_train.shape[0]} samples.")
+print(f"Test set has {g05_X_test.shape[0]} samples.")
+
 
 ```
 
@@ -111,6 +144,41 @@ Execute a classification routine using RandomForestClassifier(), BaggingClassifi
 
 ```{python}
 # Add code here
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score, classification_report
+from sklearn.metrics import confusion_matrix
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# one hot encoding 
+g05_X_train = pd.get_dummies(g05_X_train)
+g05_X_test = pd.get_dummies(g05_X_test)
+
+# built rf model
+g05_rf = RandomForestClassifier(n_estimators=100)
+g05_rf.fit(g05_X_train, g05_y_train)
+
+# make prediction
+g05_y_pred = g05_rf.predict(g05_X_test)
+
+# calculate the accuracy
+print(f"Accuracy: {accuracy_score(g05_y_test, g05_y_pred) * 100:.2f}%")
+print("\nClassification Report:\n", classification_report(g05_y_test, g05_y_pred))
+
+
+# Predicting the values on the test set
+g05_y_pred = g05_rf.predict(g05_X_test)
+
+# Calculating the confusion matrix
+g05_cm = confusion_matrix(g05_y_test, g05_y_pred)
+
+# Printing the confusion matrix using seaborn for better visualization
+plt.figure(figsize=(10,7))
+sns.heatmap(g05_cm, annot=True, fmt='g', cmap='Blues')
+plt.xlabel('Predicted labels')
+plt.ylabel('True labels')
+plt.title('Confusion Matrix for RandomForestClassifier')
+plt.show()
 
 ```
 
