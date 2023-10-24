@@ -1,0 +1,152 @@
+---
+title: "Assignment 03"
+subtitle: "Hyperparameter Tunning - Group Number Here"
+date: 09/29/2023
+date-modified: last-modified
+date-format: long
+format:
+  html:
+    theme: [cosmo, theme.scss]
+    toc: true
+    embed-resources: true
+    number-sections: true
+author:
+  - name: Nakul R. Padalkar
+    affiliations:
+      - id: gu
+        name: Georgetown University
+        city: Washington
+        state: DC
+  - name: Michael Varnerin
+    affiliations:
+      - ref: gu
+  - name: Minsuh Lim
+    affiliations:
+      - ref: gu
+  - name: Jingda Yang
+    affiliations:
+      - ref: gu
+---
+
+
+# Instructions (Remove the instructions before submission)
+
+This assignment will deal with tuning the hyperparameters for the [online shopping dataset](https://archive.ics.uci.edu/dataset/468/online+shoppers+purchasing+intention+dataset). Make sure to remove the instructions and only keep Q6 onward. The qmd file of this assignment is located in the [files folder](https://georgetown.instructure.com/files/11681026/download?download_frd=1).
+
+- This is a group assignment with independent submission on Canvas. Collaboration is essential. Use Git for version control.
+- Begin by setting your random seed as the last four digits of your GUID.
+- Prefix each variable with 'g#groupnumber' (e.g., g01_variableName) to ensure uniqueness and to demonstrate originality in your group's work.
+- add the names of all group members to the YAML header above.
+- Use of Generative AI tools, including but not restricted to GPT-3 is strictly prohibited.
+
+## Git Commit and Collaboration
+
+- This is a group assignment. Collaboration is essential. Use Git for version control.
+- Regular and meaningful commit messages are expected, indicating steady progress and contributions from all group members.
+- Avoid large, infrequent commits. Instead, aim for more minor, frequent updates showing your code's evolution and thoughts.
+- Collaboration tools, especially Git, should be used as a backup tool and a truly collaborative platform. Discuss, review, and merge each other's contributions.
+
+# Grading Criteria
+
+- The assignment is worth 75 points.
+- There are three grading milestones in the assignment.
+  - Adherence to Requirements, Coding Standards, Documentation, Runtime, and Efficiency (22 Points)
+    - Adherence to Requirements (5 Points): Ensure all the given requirements of the assignment, including Git commits and collaboration, are met.
+    - Coding Standards (5 Points): Code should be readable and maintainable. Ensure appropriate variable naming and code commenting.
+    - Documentation (6 Points): Provide explanations or reasoning for using a particular command and describe the outputs. Avoid vague descriptions; aim for clarity and depth.
+    - Runtime (3 Points): The code should execute without errors and handle possible exceptions.
+    - Efficiency (3 Points): Implement efficient coding practices, avoid redundancy, and optimize for performance where applicable.
+  - Collaborative Programming (13 Points)
+    - GitHub Repository Structure (3 Points): A well-organized repository with clear directory structures and meaningful file names.
+    - Number of Commits (3 Points): Reflects steady progress and contributions from all group members.
+    - Commit Quality (3 Points): Clear, descriptive commit messages representing logical chunks of work. Avoid trivial commits like "typo fix."
+    - Collaboration & Contribution (4 Points): Demonstrated teamwork where each member contributes significantly. This can be seen through pull requests, code reviews, and merge activities.
+  - Assignment Questions (40 Points)
+
+# Adherence to Requirements, Coding Standards, Documentation, Runtime, and Efficiency (22 Points)
+This section is graded based on adherence to Requirements, Coding Standards, 
+Documentation, Runtime, and Efficiency.
+
+# Collaborative Programming (13 Points)
+
+This section is graded based on the Github submission. Each person needs to have made commits to the repository. GitHub Repository Structure, Number of Commits, Commit Quality, Collaboration, and Contribution are generally graded based on the group's overall performance. However, if there is a significant difference in the number of commits or contributions between group members, the instructor may adjust the grade accordingly.
+
+
+# Assignment Questions (40 Points)
+
+# Data Preparation (7 Points):
+
+```{python}
+# Add data preparation code here
+
+
+```
+
+## Load the dataset and display the dataframe (2 Points).
+
+```{python}
+# Add code here
+
+```
+
+## Use `describe` to provide statistics on the pandas Dataframe (2 Points).
+
+```{python}
+# Add code here
+
+```
+
+## Split the dataset into a Training set and a Test set. Justify your preferred split (3 Points).
+
+```{python}
+# Add code here
+
+```
+
+# Classification Routine (12 Points):
+
+Execute a classification routine using RandomForestClassifier(), BaggingClassifier(), and XGboostclassifier(). Independently output the accuracy box plot as discussed in class. Use any package you are comfortable with (seaborn, matplotlib).
+
+## RandomForestClassifier():
+
+```{python}
+# Add code here
+
+```
+
+## BaggingClassifier():
+
+```{python}
+# Add code here
+
+```
+
+## XGboostclassifier():
+
+```{python}
+# Add code here
+
+```
+
+# Classification with GridSearchCV (8 Points):
+
+Replicate the classification from Q2 using GridsearchCV().
+```{python}
+# Add code here
+
+```
+
+
+
+# Classification with RandomSearchCV (8 Points):
+
+Replicate the classification from Q2 using RandomSearchCV().
+
+```{python}
+# Add code here
+
+```
+
+# Comparison and Analysis (5 Points):
+
+Compare the results from Q2, Q3, and Q4. Describe the best hyperparameters for all three experiments.
