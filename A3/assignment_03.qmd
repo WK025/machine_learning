@@ -85,8 +85,8 @@ import pandas as pd
 random.seed(1494)
 
 # load dataset
-url = "https://archive.ics.uci.edu/ml/machine-learning-databases/00468/online_shoppers_intention.csv"
-g05_df = pd.read_csv(url)
+g05_url = "https://archive.ics.uci.edu/ml/machine-learning-databases/00468/online_shoppers_intention.csv"
+g05_df = pd.read_csv(g05_url)
 
 # check the data info
 g05_df.head()
@@ -103,7 +103,6 @@ g05_df.dropna(inplace=True)
 
 ```{python}
 # Add code here
-
 g05_df.head()
 
 ```
