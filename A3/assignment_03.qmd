@@ -192,6 +192,24 @@ plt.show()
 
 ```{python}
 # Add code here
+from xgboost import XGBClassifier
+from sklearn.metrics import ConfusionMatrixDisplay
+
+# Intialize XGBClassifier
+g05_xgb = XGBClassifier(n_estimators=100)
+# Fit model
+g05_xgb_fit = g05_xgb.fit(g05_X_train, g05_y_train)
+# Make predictions
+g05_pred_xgb = g05_xgb_fit.predict(g05_X_test)
+
+# Accuracy and classification report 
+g05_xgb_accuracy = accuracy_score(y_true=g05_y_test, y_pred=g05_pred_xgb)
+print("XGBoost Classifier Accuracy: {:.2%}".format(g05_xgb_accuracy))
+print(classification_report(g05_y_test, g05_pred_xgb))
+
+# confusion matrix
+g05_cm_xgb = confusion_matrix(g05_y_test, g05_pred_xgb)
+ConfusionMatrixDisplay.from_estimator(g05_xgb_fit, g05_X_test, g05_y_test)
 
 ```
 
@@ -201,6 +219,28 @@ Replicate the classification from Q2 using GridsearchCV().
 ```{python}
 # Add code here
 
+# GridSearchCV for XGBClassifier
+from sklearn.model_selection import GridSearchCV
+from sklearn.model_selection import RepeatedStratifiedKFold
+
+# define model
+g05_xgb_model = XGBClassifier()
+# define search space
+g05_xgb_space = dict()
+g05_xgb_space['booster'] = ['gbtree', 'gblinear', 'dart']
+g05_xgb_space['learning_rate'] = [1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1, 10, 100]
+g05_xgb_space['gamma'] = [1e-4, 1e-3, 1e-2, 1e-1, 1, 10, 100]
+
+# define evaluation
+cv = RepeatedStratifiedKFold(n_splits=5, n_repeats=3, random_state=1)
+
+# define grid search
+g05_xgb_grid_search = GridSearchCV(g05_xgb_model, g05_xgb_space, scoring='accuracy', n_jobs=5, cv=cv)
+
+g05_xgb_grid_result = g05_xgb_grid_search.fit(g05_X_train, g05_y_train)
+# summarize result
+print('Best Score: %s' % g05_xgb_grid_result.best_score_)
+print('Best Hyperparameters chosen by GridSearchCV: %s' % g05_xgb_grid_result.best_params_)
 ```
 
 
@@ -212,6 +252,24 @@ Replicate the classification from Q2 using RandomSearchCV().
 ```{python}
 # Add code here
 
+# RandomSearchCV for XGBClassifier
+# define random search
+from sklearn.model_selection import RandomizedSearchCV
+from scipy.stats import loguniform
+
+# define search space
+g05_xgb_space = dict()
+g05_xgb_space['booster'] = ['gbtree', 'gblinear', 'dart']
+g05_xgb_space['learning_rate'] = loguniform(1e-5, 100)
+g05_xgb_space['gamma'] = loguniform(1e-5, 100)
+
+# define random search
+g05_xgb_random_search = RandomizedSearchCV(g05_xgb_model, g05_xgb_space, n_iter=500, scoring='accuracy', n_jobs=5, cv=cv, random_state=42)
+
+g05_xgb_random_result = g05_xgb_random_search.fit(g05_X_train, g05_y_train)
+# summarize result
+print('Best Score: %s' % g05_xgb_random_result.best_score_)
+print('Best Hyperparameters: %s' % g05_xgb_random_result.best_params_)
 ```
 
 # Comparison and Analysis (5 Points):
