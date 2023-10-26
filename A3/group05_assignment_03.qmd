@@ -1,0 +1,531 @@
+---
+title: Assignment 03
+subtitle: Hyperparameter Tunning - Group 05
+date: 09/29/2023
+date-modified: last-modified
+date-format: long
+format:
+  html:
+    theme:
+      - cosmo
+      - theme.scss
+    toc: true
+    embed-resources: true
+    number-sections: true
+author:
+  - name: Haoqi Wang
+    affiliations:
+      - id: gu
+        name: Georgetown University
+        city: Washington
+        state: DC
+  - name: Kaiyue Wei
+    affiliations:
+      - ref: gu
+  - name: Yanyan Li
+    affiliations:
+      - ref: gu
+  - name: Xulu Wang
+    affiliations:
+      - ref: gu
+jupyter: python3
+---
+
+# Assignment Questions (40 Points)
+
+# Data Preparation (7 Points):
+
+```{python}
+# Add data preparation code here
+import random
+import pandas as pd
+
+# set random seed
+random.seed(1494)
+
+# load dataset
+g05_url = "https://archive.ics.uci.edu/ml/machine-learning-databases/00468/online_shoppers_intention.csv"
+g05_df = pd.read_csv(g05_url)
+
+# check the data info
+g05_df.head()
+g05_df.info()
+
+
+# check any missing values and remove it
+g05_df.isnull().sum()
+g05_df.dropna(inplace=True)
+```
+
+## Load the dataset and display the dataframe (2 Points).
+
+```{python}
+# Add code here
+g05_df.head()
+```
+
+## Use `describe` to provide statistics on the pandas Dataframe (2 Points).
+
+```{python}
+# Add code here
+g05_df.describe()
+```
+
+## Split the dataset into a Training set and a Test set. Justify your preferred split (3 Points).
+
+```{python}
+# Add code here
+
+from sklearn.model_selection import train_test_split
+
+# Assuming the target variable is 'Revenue'
+g05_X = g05_df.drop('Revenue', axis=1)
+g05_y = g05_df['Revenue']
+
+# Splitting the dataset into training (80%) and test set (20%)
+g05_X_train, g05_X_test, g05_y_train, g05_y_test = train_test_split(g05_X, g05_y, test_size=0.2, random_state=42)
+
+print(f"Training set has {g05_X_train.shape[0]} samples.")
+print(f"Test set has {g05_X_test.shape[0]} samples.")
+```
+
+# Classification Routine (12 Points):
+
+Execute a classification routine using RandomForestClassifier(), BaggingClassifier(), and XGboostclassifier(). Independently output the accuracy box plot as discussed in class. Use any package you are comfortable with (seaborn, matplotlib).
+
+## RandomForestClassifier():
+
+```{python}
+# Add code here
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score, classification_report
+from sklearn.metrics import confusion_matrix
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# one hot encoding 
+g05_X_train = pd.get_dummies(g05_X_train)
+g05_X_test = pd.get_dummies(g05_X_test)
+
+# built rf model
+g05_rf = RandomForestClassifier(n_estimators=100)
+g05_rf.fit(g05_X_train, g05_y_train)
+
+# make prediction
+g05_y_rf_pred = g05_rf.predict(g05_X_test)
+
+# calculate the accuracy
+print(f"Accuracy: {accuracy_score(g05_y_test, g05_y_rf_pred) * 100:.2f}%")
+print("\nClassification Report:\n", classification_report(g05_y_test, g05_y_rf_pred))
+
+# Calculating the confusion matrix
+g05_cm = confusion_matrix(g05_y_test, g05_y_rf_pred)
+
+# Printing the confusion matrix using seaborn for better visualization
+plt.figure(figsize=(10,7))
+sns.heatmap(g05_cm, annot=True, fmt='g', cmap='Blues')
+plt.xlabel('Predicted labels')
+plt.ylabel('True labels')
+plt.title('Confusion Matrix for RandomForestClassifier')
+plt.show()
+```
+
+## BaggingClassifier():
+
+```{python}
+# Add code here
+from sklearn.ensemble import BaggingClassifier
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import make_scorer, accuracy_score, classification_report, confusion_matrix
+
+seed = 3225
+num_folds = 5
+scoring = {'AUC': 'roc_auc', 'Accuracy': make_scorer(accuracy_score)}
+
+# built rf model
+# g05_bagg = BaggingClassifier(n_estimators=100)
+g05_bagg = BaggingClassifier(DecisionTreeClassifier(max_features="auto", 
+                                                    splitter="random", 
+                                                    max_leaf_nodes=16, 
+                                                    random_state=seed),
+                            n_estimators=100)
+
+g05_bagg.fit(g05_X_train, g05_y_train)
+
+# make prediction
+g05_y_bagg_pred = g05_bagg.predict(g05_X_test)
+
+# calculate the accuracy
+print(f"Accuracy: {accuracy_score(g05_y_test, g05_y_bagg_pred) * 100:.2f}%")
+print("\nClassification Report:\n", classification_report(g05_y_test, g05_y_bagg_pred))
+
+# Calculating the confusion matrix
+g05_bagg_cm = confusion_matrix(g05_y_test, g05_y_bagg_pred)
+
+# Printing the confusion matrix using seaborn for better visualization
+plt.figure(figsize=(10,7))
+sns.heatmap(g05_bagg_cm, annot=True, fmt='g', cmap='Blues')
+plt.xlabel('Predicted labels')
+plt.ylabel('True labels')
+plt.title('Confusion Matrix for BaggingClassifier')
+plt.show()
+```
+
+## XGboostclassifier():
+
+```{python}
+# Add code here
+from xgboost import XGBClassifier
+
+# Intialize XGBClassifier
+g05_xgb = XGBClassifier(n_estimators=100)
+# Fit model
+g05_xgb_fit = g05_xgb.fit(g05_X_train, g05_y_train)
+# Make predictions
+g05_pred_xgb = g05_xgb_fit.predict(g05_X_test)
+
+# Accuracy and classification report 
+g05_xgb_accuracy = accuracy_score(y_true=g05_y_test, y_pred=g05_pred_xgb)
+print("XGBoost Classifier Accuracy: {:.2%}".format(g05_xgb_accuracy))
+print(classification_report(g05_y_test, g05_pred_xgb))
+
+# confusion matrix
+g05_cm_xgb = confusion_matrix(g05_y_test, g05_pred_xgb)
+# Printing the confusion matrix using seaborn for better visualization
+plt.figure(figsize=(10,7))
+sns.heatmap(g05_cm_xgb, annot=True, fmt='g', cmap='Blues')
+plt.xlabel('Predicted labels')
+plt.ylabel('True labels')
+plt.title('Confusion Matrix for XGBClassifier')
+plt.show()
+```
+
+# Classification with GridSearchCV (8 Points):
+
+Replicate the classification from Q2 using GridsearchCV().
+
+## RandomForestClassifier with GridSearchCV
+
+```{python}
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+from sklearn.model_selection import GridSearchCV
+import seaborn as sns
+import matplotlib.pyplot as plt
+import pandas as pd  # Make sure to import pandas
+
+# Define the parameter grid
+g05_param_grid = {
+    'n_estimators': [50, 100, 150],
+    'max_depth': [None, 10, 20, 30],
+    'min_samples_split': [2, 5, 10],
+    'min_samples_leaf': [1, 2, 4]
+}
+
+# Create a RandomForestClassifier 
+g05_rf = RandomForestClassifier()
+
+# Instantiate GridSearchCV with the model and the parameter grid
+g05_grid_search = GridSearchCV(estimator=g05_rf, param_grid=g05_param_grid, 
+                           cv=5, n_jobs=-1, verbose=2, scoring='accuracy')
+
+# Fit the grid search to the data
+g05_grid_search.fit(g05_X_train, g05_y_train)
+
+# Display the best score and hyperparameters
+print("Best: %f using %s" % (g05_grid_search.best_score_, g05_grid_search.best_params_))
+
+# Get the best model
+g05_best_rf = g05_grid_search.best_estimator_
+
+# Make prediction
+g05_y_rf_pred = g05_best_rf.predict(g05_X_test)
+
+
+```
+
+```{python}
+# Calculate and display the accuracy
+accuracy = accuracy_score(g05_y_test, g05_y_rf_pred)
+print("\nAccuracy: {:.2%}\n".format(accuracy))
+
+# Display the classification report
+print("Classification Report:")
+print(classification_report(g05_y_test, g05_y_rf_pred))
+
+# Calculating the confusion matrix
+g05_cm = confusion_matrix(g05_y_test, g05_y_rf_pred)
+
+# Printing the confusion matrix using seaborn for better visualization
+plt.figure(figsize=(10,7))
+sns.heatmap(g05_cm, annot=True, fmt='g', cmap='Blues')
+plt.xlabel('Predicted labels')
+plt.ylabel('True labels')
+plt.title('Confusion Matrix for Optimized RandomForestClassifier')
+plt.show()
+```
+
+## BaggingClassifier with GridSearchCV
+
+```{python}
+#| output: false
+#| warning: false
+
+# Add code here
+from sklearn.model_selection import GridSearchCV
+from sklearn.model_selection import RepeatedStratifiedKFold
+from sklearn.model_selection import StratifiedKFold
+# BaggingClasifie
+g_05_bagg_grid_para = {
+    "n_estimators" : [10, 25, 50, 100, 250, 500, 1000],
+    "bootstrap" : [True],
+    "max_samples" : [0.05, 0.1, 0.2, 0.5, 0.7],
+    "oob_score" : [True]  # Only for bootstrap equals to True
+}
+
+kfold = StratifiedKFold(n_splits=num_folds, random_state=seed, shuffle=True)
+
+g_05_bagg_grid = GridSearchCV(estimator=g05_bagg,
+                    param_grid=g_05_bagg_grid_para,
+                    cv=kfold,
+                    scoring=scoring,
+                    return_train_score=True,
+                    n_jobs=-1,
+                    refit="AUC",
+                    verbose=10)
+
+g_05_best_bagg_grid = g_05_bagg_grid.fit(g05_X_train, g05_y_train)
+# print("Best: %f using %s" % (g_05_best_bagg_grid.best_score_,g_05_best_bagg_grid.best_params_))
+```
+
+```{python}
+print("Best: %f using %s" % (g_05_best_bagg_grid.best_score_,g_05_best_bagg_grid.best_params_))
+
+g05_y_bagg_grid_pred = g_05_best_bagg_grid.predict(g05_X_test)
+
+# calculate the accuracy
+print(f"Accuracy: {accuracy_score(g05_y_test, g05_y_bagg_grid_pred) * 100:.2f}%")
+print("\nClassification Report:\n", classification_report(g05_y_test, g05_y_bagg_grid_pred))
+
+# Calculating the confusion matrix
+g05_bagg_grid_cm = confusion_matrix(g05_y_test, g05_y_bagg_grid_pred)
+
+# Printing the confusion matrix using seaborn for better visualization
+plt.figure(figsize=(10,7))
+sns.heatmap(g05_bagg_grid_cm, annot=True, fmt='g', cmap='Blues')
+plt.xlabel('Predicted labels')
+plt.ylabel('True labels')
+plt.title('Confusion Matrix for BaggingClassifier with Grid Search')
+plt.show()
+```
+
+## XGBClassifier with GridSearchCV
+
+```{python}
+from sklearn.model_selection import GridSearchCV
+from sklearn.model_selection import RepeatedStratifiedKFold
+
+# define model
+g05_xgb_model = XGBClassifier()
+# define search space
+g05_xgb_space = dict()
+g05_xgb_space['booster'] = ['gbtree', 'gblinear', 'dart']
+g05_xgb_space['learning_rate'] = [1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1, 10]
+g05_xgb_space['gamma'] = [1e-4, 1e-3, 1e-2, 1e-1, 1, 10]
+
+# define evaluation
+cv = RepeatedStratifiedKFold(n_splits=5, n_repeats=3, random_state=1)
+
+# define grid search
+g05_xgb_grid_search = GridSearchCV(g05_xgb_model, g05_xgb_space, scoring='accuracy', n_jobs=5, cv=cv)
+
+g05_xgb_grid_result = g05_xgb_grid_search.fit(g05_X_train, g05_y_train)
+g05_xgb_grid_pred = g05_xgb_grid_result.predict(g05_X_test)
+# summarize result
+print('Best Score: %s' % g05_xgb_grid_result.best_score_)
+print('Best Hyperparameters chosen by GridSearchCV: %s' % g05_xgb_grid_result.best_params_)
+
+# Accuracy and classification report 
+g05_xgb_grid_accuracy = accuracy_score(y_true=g05_y_test, y_pred=g05_xgb_grid_pred)
+print("XGBoost Classifier Accuracy: {:.2%}".format(g05_xgb_grid_accuracy))
+print(classification_report(g05_y_test, g05_xgb_grid_pred))
+
+# confusion matrix
+g05_cm_grid_xgb = confusion_matrix(g05_y_test, g05_xgb_grid_pred)
+# Printing the confusion matrix using seaborn for better visualization
+plt.figure(figsize=(10,7))
+sns.heatmap(g05_cm_grid_xgb, annot=True, fmt='g', cmap='Blues')
+plt.xlabel('Predicted labels')
+plt.ylabel('True labels')
+plt.title('Confusion Matrix for XGBClassifier')
+plt.show()
+```
+
+# Classification with RandomSearchCV (8 Points):
+
+Replicate the classification from Q2 using RandomSearchCV().
+
+## RandomForestClassifier with RandomSearchCV
+
+```{python}
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+from sklearn.model_selection import RandomizedSearchCV
+from scipy.stats import randint
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# Define the parameter space
+g05_param_dist = {
+    'n_estimators': randint(10, 200),
+    'max_depth': [None] + list(randint(1, 20).rvs(10)),
+    'min_samples_split': randint(2, 11),
+    'min_samples_leaf': randint(1, 11),
+    'bootstrap': [True, False]
+}
+
+# Create a RandomForestClassifier
+g05_rf = RandomForestClassifier()
+
+# Instantiate RandomizedSearchCV with the model and the parameter distribution
+random_search = RandomizedSearchCV(estimator=g05_rf, param_distributions=g05_param_dist, 
+                                   n_iter=100, cv=5, n_jobs=-1, verbose=2, scoring='accuracy', random_state=42)
+
+# Fit the random search to the data
+random_search.fit(g05_X_train, g05_y_train)
+
+# Display the best score and hyperparameters
+print("Best: %f using %s" % (random_search.best_score_, random_search.best_params_))
+
+# Get the best model
+g05_best_rf = random_search.best_estimator_
+
+# Make prediction
+g05_y_rf_pred = g05_best_rf.predict(g05_X_test)
+```
+
+```{python}
+# Display results
+print("\nAccuracy: {:.2%}".format(accuracy_score(g05_y_test, g05_y_rf_pred)))
+print("Classification Report:")
+print(classification_report(g05_y_test, g05_y_rf_pred))
+
+# Calculating the confusion matrix
+g05_cm = confusion_matrix(g05_y_test, g05_y_rf_pred)
+
+# Printing the confusion matrix using seaborn for better visualization
+plt.figure(figsize=(10,7))
+sns.heatmap(g05_cm, annot=True, fmt='g', cmap='Blues')
+plt.xlabel('Predicted labels')
+plt.ylabel('True labels')
+plt.title('Confusion Matrix for Optimized RandomForestClassifier with RandomSearchCV')
+plt.show()
+```
+
+## BaggingClassifier with RandomSearchCV
+
+```{python}
+# Add code here
+import numpy as np
+from sklearn.model_selection import RandomizedSearchCV
+```
+
+```{python}
+#| output: false
+#| warning: false
+num_folds = 5
+kfold = StratifiedKFold(n_splits=num_folds, random_state=seed, shuffle=True)
+
+# Number of trees in bagging classifer base model - decision tree
+n_estimators = [int(x) for x in np.linspace(start = 200, stop = 2000, num = 10)]
+# Number of features to consider at every split
+max_features = [0.5, 0.7, 1.0]
+# max samples to consider at every split
+max_samples = [0.05, 0.1, 0.2, 0.5, 0.6, 0.7]
+
+# Create the random grid
+g_05_bagg_random_para = {'n_estimators' : n_estimators,
+                         'max_features': max_features,
+                         'max_samples' : max_samples}
+
+g_05_bagg_random=RandomizedSearchCV(estimator=g05_bagg,
+                               param_distributions=g_05_bagg_random_para,
+                               n_iter=50,
+                               cv=kfold,
+                               verbose=2,
+                               random_state=seed,
+                               n_jobs=-1)
+
+g_05_best_bagg_random = g_05_bagg_random.fit(g05_X_train, g05_y_train)
+```
+
+```{python}
+best_random_grid=g_05_best_bagg_random.best_estimator_
+
+print("Best: %f using %s" % (g_05_best_bagg_random.best_score_,g_05_best_bagg_random.best_params_))
+
+g05_y_bagg_random_pred = g_05_best_bagg_random.predict(g05_X_test)
+
+# calculate the accuracy
+print(f"Accuracy: {accuracy_score(g05_y_test, g05_y_bagg_random_pred) * 100:.2f}%")
+print("\nClassification Report:\n", classification_report(g05_y_test, g05_y_bagg_random_pred))
+
+# Calculating the confusion matrix
+g05_bagg_random_cm = confusion_matrix(g05_y_test, g05_y_bagg_random_pred)
+
+# Printing the confusion matrix using seaborn for better visualization
+plt.figure(figsize=(10,7))
+sns.heatmap(g05_bagg_random_cm, annot=True, fmt='g', cmap='Blues')
+plt.xlabel('Predicted labels')
+plt.ylabel('True labels')
+plt.title('Confusion Matrix for BaggingClassifier with Random Search')
+plt.show()
+```
+
+## XGBClassifier with RandomSearchCV
+
+```{python}
+from scipy.stats import loguniform
+from sklearn.model_selection import RandomizedSearchCV
+
+# define search space
+g05_xgb_space = dict()
+g05_xgb_space['booster'] = ['gbtree', 'gblinear', 'dart']
+g05_xgb_space['learning_rate'] = loguniform(1e-5, 10)
+g05_xgb_space['gamma'] = loguniform(1e-5, 100)
+
+# define random search
+g05_xgb_random_search = RandomizedSearchCV(g05_xgb_model, g05_xgb_space, n_iter=300, scoring='accuracy', n_jobs=5, cv=cv, random_state=42)
+
+g05_xgb_random_result = g05_xgb_random_search.fit(g05_X_train, g05_y_train)
+g05_xgb_random_pred = g05_xgb_random_result.predict(g05_X_test)
+# summarize result
+print('Best Score: %s' % g05_xgb_random_result.best_score_)
+print('Best Hyperparameters: %s' % g05_xgb_random_result.best_params_)
+
+# Accuracy and classification report 
+g05_xgb_random_accuracy = accuracy_score(y_true=g05_y_test, y_pred=g05_xgb_random_pred)
+print("XGBoost Classifier Accuracy: {:.2%}".format(g05_xgb_random_accuracy))
+print(classification_report(g05_y_test, g05_xgb_random_pred))
+
+# confusion matrix
+g05_cm_random_xgb = confusion_matrix(g05_y_test, g05_xgb_random_pred)
+# Printing the confusion matrix using seaborn for better visualization
+plt.figure(figsize=(10,7))
+sns.heatmap(g05_cm_random_xgb, annot=True, fmt='g', cmap='Blues')
+plt.xlabel('Predicted labels')
+plt.ylabel('True labels')
+plt.title('Confusion Matrix for XGBClassifier')
+plt.show()
+```
+
+# Comparison and Analysis (5 Points):
+
+Compare the results from Q2, Q3, and Q4. Describe the best hyperparameters for all three experiments.
+
+RandomForestClassifier: All three models have a similar accuracy, hovering around 89%. The model optimized with RandomSearchCV has the highest accuracy at 89.54%, but the differences are marginal.  The precision for the "True" class has increased slightly in the RandomSearchCV model, indicating that it has reduced the number of false positives relative to the original model. The F1-score considers both precision and recall. The model with GirdSearchCV has the highest F1-score for the "True" class, suggesting that it strikes the best balance between precision and recall among the three models. Thus, If you prioritize accuracy and minimizing false predictions, then the model optimized with RandomSearchCV is the best choice.However, if you want a better balance between precision and recall, the model with GridSearchCV seems to strike a better balance.
+
+BaggingClassifier: For the overall accuracy, the models with RandomSearchCV(88.85%) and GridSearchCV(88.69%) improve a lot compared to original model(83.41%).The base BaggingClassifier struggles with predicting the 'True' class, having a recall of just 0.01. Both Grid Search and Random Search considerably enhance the performance, with Random Search having a minor edge over Grid Search in this context.In terms of optimization techniques, both Grid Search and Random Search have shown to be effective in improving the classifier's performance. However, the difference between the two optimization methods is marginal. Thus, Considering accuracy, precision, and recall, the BaggingClassifier with Random Search offers the best performance among the three. However, the difference between Grid Search and Random Search is slight, so the choice may come down to computational resources and time, as Grid Search can be more computationally expensive.
+
+XGBboostClassifier: All three methods produce comparable accuracies, but both Grid Search and Random Search have a slight edge over the original model. Grid Search offers the best precision for the True class, while its recall is comparable to the original method. Random Search's precision for the True class is slightly better than the original but falls a bit behind Grid Search.Fewer False Positives and False Negatives are generally desirable. Grid Search has the fewest False Positives, while Random Search has the fewest False Negatives. In conclusion, while the differences are not massive, both Grid Search and Random Search offer improvements over the original setup. Grid Search seems to provide the best balance in terms of precision, recall, and F1-Score, especially for the class labeled as True. However, the choice between the methods might also depend on computational resources and time, as Grid Search can be more computationally intensive.
+
