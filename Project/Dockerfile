@@ -24,9 +24,13 @@ RUN pip3 install -r app/requirements.txt --target "app"
 
 ##### Copy function code to docker container
 
-# ***CODE TO DO***
-# ADD the app.py file into the ${LAMBDA_TASK_ROOT} directory in the container
+# ADD the app.py file into the app directory in the container
 COPY app.py .
+
+# ADD the data and pickle file into the app/data and app/saved_stacked_models directory in the container
+COPY datasets/downsampled_dataset_after_feature_selection.csv ./datasets
+COPY saved_stacked_models/StackedPickleSmoking.pkl ./saved_stacked_models
+COPY saved_stacked_models/StackedPickleDrinking.pkl ./saved_stacked_models
 
 # Expose the port used by Streamlit (8501 by default)
 EXPOSE 8501
