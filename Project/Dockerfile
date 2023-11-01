@@ -1,7 +1,11 @@
-# syntax=docker/dockerfile:1
+# docker build -t streamlit .
+# docker images
+# docker run -p 8501:8501 streamlit
+# docker rm $(docker ps -aq)
+# docker rmi $(docker images -q)
 
 # Sets the Base Image
-FROM python:3.9-slim
+FROM python:3.11.0-slim
 WORKDIR /app
 
 # Install Git to clone
@@ -12,25 +16,26 @@ WORKDIR /app
 #     git \
 #     && rm -rf /var/lib/apt/lists/*
 # Clone the repo
-# RUN git clone https://github.com/streamlit/streamlit-example.git .
+# RUN git clone https://github.com/WK025/machine_learning.git ./Project
+
 
 ##### copy requirements file and install necessary packages
 
-# ***CODE TO DO***
-# ADD the requirements.txt into the ${LAMBDA_TASK_ROOT} directory in the container
-COPY requirements.txt .
+# ADD the requirements.txt into the /app directory in the container
+COPY requirements.txt /app
 
-RUN pip3 install -r app/requirements.txt --target "app"
+RUN pip3 install -r requirements.txt --target "streamlit"
+
 
 ##### Copy function code to docker container
 
-# ADD the app.py file into the app directory in the container
-COPY app.py .
+# ADD the app.py file into the /app directory in the container
+COPY app.py /app
 
-# ADD the data and pickle file into the app/data and app/saved_stacked_models directory in the container
-COPY datasets/downsampled_dataset_after_feature_selection.csv ./datasets
-COPY saved_stacked_models/StackedPickleSmoking.pkl ./saved_stacked_models
-COPY saved_stacked_models/StackedPickleDrinking.pkl ./saved_stacked_models
+# ADD the data and pickle file into the /app/datasets and /app/saved_stacked_models directory in the container
+COPY datasets/downsampled_dataset_after_feature_selection.csv /app/datasets
+COPY saved_stacked_models/StackedPickleSmoking.pkl /app/saved_stacked_models
+COPY saved_stacked_models/StackedPickleDrinking.pkl /app/saved_stacked_models
 
 # Expose the port used by Streamlit (8501 by default)
 EXPOSE 8501
@@ -38,14 +43,17 @@ EXPOSE 8501
 # Test a container to check that it is still working
 HEALTHCHECK CMD curl --fail http://localhost:8501/_stcore/health
 
-##### SET THE COMMAND OF THE CONTAINER FOR THE LAMBDA HANDLER
+##### SET THE COMMAND OF THE CONTAINER FOR /app
 # app (name of py file)
 # handler (name of function to execute for lambda job)
-CMD ["streamlit", "run", "app.py"]
+# CMD ["streamlit", "run", "./app.py"]
+# RUN ["chmod", "+x", "/docker/entrypoints/docker-entrypoint.sh"] \
+    # ["chmod", "+x", "/docker/entrypoints/sidekiq-entrypoint.sh"]
+# ENTRYPOINT ["./docker/entrypoints/docker-entrypoint.sh"]
 
 # Configure a container that will run as an executable
-# ENTRYPOINT ["streamlit", "run", "streamlit_app.py", "--server.port=8501", "--server.address=0.0.0.0"]
-
-# docker build -t streamlit-app .
-# docker images
-# docker run -p 8501:8501 streamlit-app
+ENTRYPOINT ["streamlit", "run"]
+# ENTRYPOINT ["streamlit", "run", "./app.py", "--server.port=8501", "--server.address=0.0.0.0"]
+# CMD [ "./app.py", "--server.headless", "true", "--server.fileWatcherType", "none", "--browser.gatherUsageStats", "false"]
+# CMD ["streamlit", "run", "./app.py", "--server.port=8080", "--server.address=0.0.0.0", "--server.fileWatcherType", "none", "--browser.gatherUsageStats", "false"]
+CMD ["./app.py", "--server.port=8080", "--server.address=0.0.0.0", "--server.fileWatcherType", "none", "--browser.gatherUsageStats", "false"]
