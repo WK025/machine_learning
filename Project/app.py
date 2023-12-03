@@ -14,9 +14,9 @@ path = Path(__file__).parent
 df = pd.read_csv(path/"datasets/downsampled_dataset_after_feature_selection.csv")
 
 
-# Streamlit Setup
-# set title
-st.title('Smoking and Drinking Status Prediction App')
+## Streamlit Setup
+# set title and page width
+st.set_page_config(page_title='Smoking and Drinking Status Prediction App', layout="wide")
 # set description
 st.markdown('## Boxplots for Important Features with Drinking and Smoking Status')
 
@@ -76,6 +76,9 @@ feature_vec = st.text_input("Input a comma-seperated list of features (20): ", "
 st.markdown('Example:')
 st.markdown('0,45,84,1.2,1.2,1,1,121,80,102,43,133,274,13.4,1,0.7,14,11,16,23.4')
 st.markdown('1,40,105.0,1.2,1.2,1.0,1.0,126.0,69.0,125.0,57.0,92.0,83.0,16.4,1.0,1.0,38.0,33.0,21.0,27.8')
+st.markdown('0,75,90,0.6,0.7,1,1,140,80,94,40,56,165,13,1,0.5,20,24,30,23.8')
+st.markdown('1,40,100,1.2,1.5,1,1,160,110,100,42,128,189,16.6,1,0.7,24,40,45,29.4')
+st.markdown('1,30,81,1,0.8,1,1,116,77,89,51,126,84,15.5,1,0.9,55,85,47,24.2')
 
 
 x = feature_vec.split(",")
@@ -89,8 +92,10 @@ model_select = st.radio(
         options=["Stacked", "Logistic", "GradientBoost", "SVM", "RandomForest","AdaBoost"],
     )
 
+# with open (f"./saved_models/{model_select}PickleDrinking.pkl", 'rb') as file:
 with open (path/f"saved_models/{model_select}PickleDrinking.pkl", 'rb') as file:
     pickle_drink_model = pickle.load(file)
+# with open (f"./saved_models/{model_select}PickleSmoking.pkl", 'rb') as file:
 with open (path/f"saved_models/{model_select}PickleSmoking.pkl", 'rb') as file:
     pickle_smoke_model = pickle.load(file)
 
@@ -103,7 +108,7 @@ if y_drink_predict==0:
     drink_res='Drinker'
 elif y_drink_predict==1:
     drink_res='Non-drinker'
-st.markdown("##### Drinking Status: "+drink_res)
+st.markdown("##### Drinking Status: ["+drink_res+"]")
 
 
 y_smoke_predict = pickle_smoke_model.predict(x)[0]
@@ -113,4 +118,4 @@ elif y_smoke_predict==1:
     smoke_res='Used to smoke but quit'
 elif y_smoke_predict==2:
     smoke_res="Still smoking"
-st.markdown("##### Smoking Status: "+smoke_res)
+st.markdown("##### Smoking Status: ["+smoke_res+"]")
