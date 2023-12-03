@@ -89,21 +89,12 @@ model_select = st.radio(
         options=["Stacked", "Logistic", "GradientBoost", "SVM", "RandomForest","AdaBoost"],
     )
 
-with open (f"./saved_models/{model_select}PickleDrinking.pkl", 'rb') as file:
+with open (path/f"saved_models/{model_select}PickleDrinking.pkl", 'rb') as file:
     pickle_drink_model = pickle.load(file)
-with open (f"./saved_models/{model_select}PickleSmoking.pkl", 'rb') as file:
+with open (path/f"saved_models/{model_select}PickleSmoking.pkl", 'rb') as file:
     pickle_smoke_model = pickle.load(file)
 
-# if model_select == "StackedModel":
-#     with open("saved_stacked_models/StackedPickleDrinking.pkl", 'rb') as file:
-#     pickle_drink_model = pickle.load(file)
-#     with open("saved_stacked_models/StackedPickleSmoking.pkl", 'rb') as file:
-#     pickle_smoke_model = pickle.load(file)
-# elif model_select == "LinearRegression":
-#     with open("saved_stacked_models/StackedPickleDrinking.pkl", 'rb') as file:
-#     pickle_drink_model = pickle.load(file)
-#     with open("saved_stacked_models/StackedPickleSmoking.pkl", 'rb') as file:
-#     pickle_smoke_model = pickle.load(file)
+
 
 st.markdown('### Prediction Results')
 
