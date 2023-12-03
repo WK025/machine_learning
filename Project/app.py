@@ -71,6 +71,22 @@ st.markdown("## Target Variable Prediction")
 st.markdown('### Data Overview')
 st.dataframe(df.head(2))
 
+feature = st.selectbox(
+    'Data Description:',
+    ('sex', 'age', 'waistline', 'sight_left', 'sight_right', 'hear_left', 'hear_right', 'SBP', 'DBP', 'BLDS','HDL_chole',
+     'LDL_chole','triglyceride','hemoglobin','urine_protein','serum_ceatinine','SGOT_AST','SGOT_ALT','gamma_GTP','bmi'))
+features_descp = {'sex': 'male,female', 'age':'Round up to 5 years', 'waistline':"Round up to 5cm", 'sight_left':'Eyesight (left)', 
+                  'sight_right':'Eyesight (right)', 'hear_left':'Hearing left, 1(normal), 2(abnormal)', 
+                  'hear_right':'Hearing right, 1(normal), 2(abnormal)', 'SBP': 'Systolic blood pressure[mmHg]', 
+                  'DBP':'Diastolic blood pressure[mmHg]','BLDS':'BLDS or FSG(fasting blood glucose)[mg/dL]',
+                  'HDL_chole':'HDL cholesterol[mg/dL]','LDL_chole':'LDL cholesterol[mg/dL]','triglyceride':'Triglyceride[mg/dL]',
+                  'hemoglobin':'Hemoglobin[g/dL]','urine_protein':'Protein in urine, 1(-), 2(+/-), 3(+1), 4(+2), 5(+3), 6(+4)',
+                  'serum_ceatinine':'Serum(blood) creatinine[mg/dL]',
+                  'SGOT_AST':'SGOT(Glutamate-oxaloacetate transaminase) AST(Aspartate transaminase)[IU/L]',
+                  'SGOT_ALT':'ALT(Alanine transaminase)[IU/L]','gamma_GTP':'y-glutamyl transpeptidase[IU/L]',
+                  'bmi':'Body mass index[kg/m^2]: body mass divided by the square of the body height'}
+st.write(features_descp[feature])
+
 st.markdown('### Input Parameters')
 feature_vec = st.text_input("Input a comma-seperated list of features (20): ", "0,35,81,0.5,0.6,1,1,93,53,85,69,117,30,11.3,1,0.8,20,7,10,23.4")
 st.markdown('Example:')
