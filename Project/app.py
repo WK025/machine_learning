@@ -6,7 +6,7 @@ import pandas as pd
 import plotly.express as px
 
 # Read data
-df = pd.read_csv("datasets/downsampled_dataset_after_feature_selection.csv")
+df = pd.read_csv("./datasets/downsampled_dataset_after_feature_selection.csv")
 # Load saved model from pickle file
 
 # Streamlit Setup
@@ -84,9 +84,9 @@ model_select = st.radio(
         options=["Stacked", "Logistic", "GradientBoost", "SVM", "RandomForest","AdaBoost"],
     )
 
-with open (f"saved_models/{model_select}PickleDrinking.pkl", 'rb') as file:
+with open (f"./saved_models/{model_select}PickleDrinking.pkl", 'rb') as file:
     pickle_drink_model = pickle.load(file)
-with open (f"saved_models/{model_select}PickleSmoking.pkl", 'rb') as file:
+with open (f"./saved_models/{model_select}PickleSmoking.pkl", 'rb') as file:
     pickle_smoke_model = pickle.load(file)
 
 # if model_select == "StackedModel":
