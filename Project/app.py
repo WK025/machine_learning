@@ -8,10 +8,6 @@ import plotly.express as px
 # Read data
 df = pd.read_csv("datasets/downsampled_dataset_after_feature_selection.csv")
 # Load saved model from pickle file
-with open("saved_stacked_models/StackedPickleDrinking.pkl", 'rb') as file:
-    pickle_drink_model = pickle.load(file)
-with open("saved_stacked_models/StackedPickleSmoking.pkl", 'rb') as file:
-    pickle_smoke_model = pickle.load(file)
 
 # Streamlit Setup
 # set title
@@ -73,24 +69,45 @@ st.dataframe(df.head(2))
 st.markdown('### Input Parameters')
 feature_vec = st.text_input("Input a comma-seperated list of features (20): ", "0,35,81,0.5,0.6,1,1,93,53,85,69,117,30,11.3,1,0.8,20,7,10,23.4")
 st.markdown('Example:')
-st.markdown('0,50,72.0,1.5,1.5,1.0,1.0,133.0,89.0,93.0,56.0,157.0,72.0,14.4,1.0,0.8,20.0,21.0,20.0,18.7')
 st.markdown('0,45,84,1.2,1.2,1,1,121,80,102,43,133,274,13.4,1,0.7,14,11,16,23.4')
 st.markdown('1,40,105.0,1.2,1.2,1.0,1.0,126.0,69.0,125.0,57.0,92.0,83.0,16.4,1.0,1.0,38.0,33.0,21.0,27.8')
-st.markdown('0,30,68.5,1.0,1.0,1.0,1.0,124.0,82.0,89.0,63.0,132.0,110.0,14.4,1.0,0.9,21.0,14.0,12.0,19.5')
-st.markdown('1,65,96.0,1.2,1.2,1.0,1.0,144.0,82.0,167.0,49.0,39.0,167.0,14.7,1.0,1.7,17.0,12.0,81.0,29.3')
 
 
 x = feature_vec.split(",")
 x = [float(i) for i in x]
 x = np.array(x).reshape(1, -1)
 
+st.markdown('### Select Model')
+model_select = st.radio(
+        label="",
+        key="visibility",
+        options=["Stacked", "Logistic", "GradientBoost", "SVM", "RandomForest","AdaBoost"],
+    )
+
+with open (f"saved_models/{model_select}PickleDrinking.pkl", 'rb') as file:
+    pickle_drink_model = pickle.load(file)
+with open (f"saved_models/{model_select}PickleSmoking.pkl", 'rb') as file:
+    pickle_smoke_model = pickle.load(file)
+
+# if model_select == "StackedModel":
+#     with open("saved_stacked_models/StackedPickleDrinking.pkl", 'rb') as file:
+#     pickle_drink_model = pickle.load(file)
+#     with open("saved_stacked_models/StackedPickleSmoking.pkl", 'rb') as file:
+#     pickle_smoke_model = pickle.load(file)
+# elif model_select == "LinearRegression":
+#     with open("saved_stacked_models/StackedPickleDrinking.pkl", 'rb') as file:
+#     pickle_drink_model = pickle.load(file)
+#     with open("saved_stacked_models/StackedPickleSmoking.pkl", 'rb') as file:
+#     pickle_smoke_model = pickle.load(file)
+
+st.markdown('### Prediction Results')
 
 y_drink_predict = pickle_drink_model.predict(x)[0]
 if y_drink_predict==0:
     drink_res='Drinker'
 elif y_drink_predict==1:
     drink_res='Non-drinker'
-st.markdown("#### Drinking Status Prediction: "+drink_res)
+st.markdown("##### Drinking Status: "+drink_res)
 
 
 y_smoke_predict = pickle_smoke_model.predict(x)[0]
@@ -100,4 +117,4 @@ elif y_smoke_predict==1:
     smoke_res='Used to smoke but quit'
 elif y_smoke_predict==2:
     smoke_res="Still smoking"
-st.markdown("#### Smoking Status Prediction: "+smoke_res)
+st.markdown("##### Smoking Status: "+smoke_res)

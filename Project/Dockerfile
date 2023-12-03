@@ -34,8 +34,7 @@ COPY app.py /app
 
 # ADD the data and pickle file into the /app/datasets and /app/saved_stacked_models directory in the container
 COPY datasets/downsampled_dataset_after_feature_selection.csv /app/datasets
-COPY saved_stacked_models/StackedPickleSmoking.pkl /app/saved_stacked_models
-COPY saved_stacked_models/StackedPickleDrinking.pkl /app/saved_stacked_models
+COPY saved_models/* /app/saved_models
 
 # Expose the port used by Streamlit (8501 by default)
 EXPOSE 8501
