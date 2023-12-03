@@ -19,9 +19,10 @@ df = pd.read_csv(path/"datasets/downsampled_dataset_after_feature_selection.csv"
 ## Streamlit Setup
 # set title and page width
 st.set_page_config(page_title='Smoking and Drinking Status Prediction App', layout="wide")
-# set description
-st.markdown('## Boxplots for Important Features with Drinking and Smoking Status')
+st.title('Smoking and Drinking Status Prediction App')
 
+# title for boxplot
+st.markdown('## Boxplots for Important Features with Drinking and Smoking Status')
 
 # Important features selected
 important_features_drk = ["gamma_GTP","age"]
@@ -92,23 +93,42 @@ AgGrid(
     df.head(10), columns_auto_size_mode=ColumnsAutoSizeMode.FIT_CONTENTS
 )
 
+# set radio to allow user to select different model
+st.markdown('### Select Model')
+st.write('<style>div.row-widget.stRadio > div{flex-direction:row;}</style>', unsafe_allow_html=True)
+model_select = st.radio(
+        label="Select Model",
+        key="models",
+        options=["Stacked", "Logistic", "GradientBoost", "SVM", "RandomForest","AdaBoost"],
+        label_visibility="collapsed"
+    )
 
 st.markdown('### Input Parameters')
 # set columns to align data input with a button to click to predict
 col1, col2 = st.columns([3, 1])
 with col1:
-    feature_vec = st.text_input("Input a comma-seperated list of features (20): ", 
-        "0,35,81,0.5,0.6,1,1,93,53,85,69,117,30,11.3,1,0.8,20,7,10,23.4")
+    feature_vec = st.text_input(label="Input a comma-seperated list of features (20): ", 
+        value="0,35,81,0.5,0.6,1,1,93,53,85,69,117,30,11.3,1,0.8,20,7,10,23.4")
 with col2:
     # in order to align button with text_input
     st.markdown('##')
     # if click button, then predict new data based on input text, else use the default example
-    if st.button('Predict'):
-        x = feature_vec.split(",")
-        x = [float(i) for i in x]
-        x = np.array(x).reshape(1, -1)
-    else:
-        x=np.array([0,35,81,0.5,0.6,1,1,93,53,85,69,117,30,11.3,1,0.8,20,7,10,23.4]).reshape(1,-1)
+    predict = st.button('Predict')
+
+
+if model_select or predict:
+    x = feature_vec.split(",")
+    x = [float(i) for i in x]
+    x = np.array(x).reshape(1, -1)
+else:
+    x=np.array([0,35,81,0.5,0.6,1,1,93,53,85,69,117,30,11.3,1,0.8,20,7,10,23.4]).reshape(1,-1)
+
+# if predict:
+#     x = feature_vec.split(",")
+#     x = [float(i) for i in x]
+#     x = np.array(x).reshape(1, -1)
+# else:
+#     x=np.array([0,35,81,0.5,0.6,1,1,93,53,85,69,117,30,11.3,1,0.8,20,7,10,23.4]).reshape(1,-1)
 
 
 # 5 columns to display 5 example, allow to copy texts
@@ -165,15 +185,6 @@ with col5:
     47,24.2
     ''')
 
-
-# set radio to allow user to select different model
-st.markdown('### Select Model')
-model_select = st.radio(
-        label="",
-        key="visibility",
-        options=["Stacked", "Logistic", "GradientBoost", "SVM", "RandomForest","AdaBoost"],
-    )
-
 # based on selected model, read corresponding model pickle file
 # with open (f"./saved_models/{model_select}PickleDrinking.pkl", 'rb') as file:
 with open (path/f"saved_models/{model_select}PickleDrinking.pkl", 'rb') as file:
@@ -211,7 +222,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-st.markdown('<p class="big-font">Prediction Results</p >', unsafe_allow_html=True)
+
 
 # Drinking prediction
 y_drink_predict = pickle_drink_model.predict(x)[0]
