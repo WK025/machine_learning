@@ -11,7 +11,7 @@ path = Path(__file__).parent
 
 # Read data
 # df = pd.read_csv("./datasets/downsampled_dataset_after_feature_selection.csv")
-df = pd.read_csv(path/"machine_learning/Project/datasets/downsampled_dataset_after_feature_selection.csv")
+df = pd.read_csv(path/"datasets/downsampled_dataset_after_feature_selection.csv")
 
 
 # Streamlit Setup
