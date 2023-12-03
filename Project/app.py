@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import plotly.express as px
 from streamlit_extras.add_vertical_space import add_vertical_space
-from st_aggrid import AgGrid
+from st_aggrid import AgGrid, GridOptionsBuilder, ColumnsAutoSizeMode
 
 from pathlib import Path
 path = Path(__file__).parent
@@ -89,7 +89,7 @@ st.markdown("## Target Variable Prediction")
 # display first 10 data
 st.markdown('### Data Overview')
 AgGrid(
-    df.head(10)
+    df.head(10), columns_auto_size_mode=ColumnsAutoSizeMode.FIT_CONTENTS
 )
 
 
