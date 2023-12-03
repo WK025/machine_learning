@@ -5,9 +5,14 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import plotly.express as px
 
+from pathlib import Path
+path = Path(__file__).parent
+
+
 # Read data
-df = pd.read_csv("./datasets/downsampled_dataset_after_feature_selection.csv")
-# Load saved model from pickle file
+# df = pd.read_csv("./datasets/downsampled_dataset_after_feature_selection.csv")
+df = pd.read_csv(path/"machine_learning/Project/datasets/downsampled_dataset_after_feature_selection.csv")
+
 
 # Streamlit Setup
 # set title
