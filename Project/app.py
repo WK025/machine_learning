@@ -4,6 +4,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 import plotly.express as px
+from streamlit_extras.add_vertical_space import add_vertical_space
+from st_aggrid import AgGrid
 
 from pathlib import Path
 path = Path(__file__).parent
@@ -100,13 +102,15 @@ with col2:
         x = [float(i) for i in x]
         x = np.array(x).reshape(1, -1)
     else:
-        x=""
+        x=np.array([0,35,81,0.5,0.6,1,1,93,53,85,69,117,30,11.3,1,0.8,20,7,10,23.4]).reshape(1,-1)
 
 st.markdown('Example:')
 st.markdown('0,45,84,1.2,1.2,1,1,121,80,102,43,133,274,13.4,1,0.7,14,11,16,23.4')
 st.markdown('1,40,105.0,1.2,1.2,1.0,1.0,126.0,69.0,125.0,57.0,92.0,83.0,16.4,1.0,1.0,38.0,33.0,21.0,27.8')
+st.markdown('0,75,90,0.6,0.7,1,1,140,80,94,40,56,165,13,1,0.5,20,24,30,23.8')
+st.markdown('1,40,100,1.2,1.5,1,1,160,110,100,42,128,189,16.6,1,0.7,24,40,45,29.4')
+st.markdown('1,30,81,1,0.8,1,1,116,77,89,51,126,84,15.5,1,0.9,55,85,47,24.2')
 
-st.markdown(x)
 
 st.markdown('### Select Model')
 model_select = st.radio(
@@ -125,21 +129,83 @@ with open (path/f"saved_models/{model_select}PickleSmoking.pkl", 'rb') as file:
 
 
 
-st.markdown('### Prediction Results')
+# st.markdown('### Prediction Results')
 
+# y_drink_predict = pickle_drink_model.predict(x)[0]
+# if y_drink_predict==0:
+#     drink_res='Drinker'
+# elif y_drink_predict==1:
+#     drink_res='Non-drinker'
+# st.markdown("##### Drinking Status: ["+drink_res+"]")
+
+
+# y_smoke_predict = pickle_smoke_model.predict(x)[0]
+# if y_smoke_predict==0:
+#     smoke_res='Never Smoking'
+# elif y_smoke_predict==1:
+#     smoke_res='Used to smoke but quit'
+# elif y_smoke_predict==2:
+#     smoke_res="Still smoking"
+# st.markdown("##### Smoking Status: ["+smoke_res+"]")
+
+
+
+# Prediction results with custom styling
+st.markdown("""
+<style>
+.big-font {
+    font-size:30px !important;
+    font-weight: bold;
+}
+.result-text {
+    font-weight: bold;
+}
+.drinker {
+    color: pink;
+}
+.non-drinker {
+    color: green;
+}
+.never-smoking {
+    color: green;
+}
+.used-to-smoke {
+    color: orange;
+}
+.still-smoking {
+    color: red;
+}
+</style>
+""", unsafe_allow_html=True)
+
+st.markdown('<p class="big-font">Prediction Results</p >', unsafe_allow_html=True)
+
+# Drinking prediction
 y_drink_predict = pickle_drink_model.predict(x)[0]
-if y_drink_predict==0:
-    drink_res='Drinker'
-elif y_drink_predict==1:
-    drink_res='Non-drinker'
-st.markdown("##### Drinking Status: ["+drink_res+"]")
+if y_drink_predict == 0:
+    drink_res = 'Drinker'
+    drink_icon = "🍷"
+    drink_class = "drinker"
+elif y_drink_predict == 1:
+    drink_res = 'Non-drinker'
+    drink_icon = "🚱"
+    drink_class = "non-drinker"
 
-
+# Smoking prediction
 y_smoke_predict = pickle_smoke_model.predict(x)[0]
-if y_smoke_predict==0:
-    smoke_res='Never Smoking'
-elif y_smoke_predict==1:
-    smoke_res='Used to smoke but quit'
-elif y_smoke_predict==2:
-    smoke_res="Still smoking"
-st.markdown("##### Smoking Status: ["+smoke_res+"]")
+if y_smoke_predict == 0:
+    smoke_res = 'Never Smoking'
+    smoke_icon = "🚭"
+    smoke_class = "never-smoking"
+elif y_smoke_predict == 1:
+    smoke_res = 'Used to smoke but quit'
+    smoke_icon = "🚬"
+    smoke_class = "used-to-smoke"
+elif y_smoke_predict == 2:
+    smoke_res = "Still smoking"
+    smoke_icon = "🔥"
+    smoke_class = "still-smoking"
+
+# Display results
+st.markdown(f'<p>Drinking Status: <span class="result-text {drink_class}">{drink_icon} {drink_res}</span></p >', unsafe_allow_html=True)
+st.markdown(f'<p>Smoking Status: <span class="result-text {smoke_class}">{smoke_icon} {smoke_res}</span></p >', unsafe_allow_html=True)
